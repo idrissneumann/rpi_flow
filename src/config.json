@@ -1,0 +1,9 @@
+{
+  "elastic_host": "localhost",
+  "elastic_port": 9200,
+  "elastic_scheme": "http",
+  "wait_time": 60,
+  "esp_ip" : "192.168.1.181",
+  "esp_data_path" : "/flow",
+  "flow_meter_index_prefix": "flow_meter"
+}
