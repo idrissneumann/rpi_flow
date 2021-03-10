@@ -6,40 +6,50 @@ from datetime import datetime
 from elasticsearch import Elasticsearch
 from time import sleep
 
+from veggie_utils import *
+from elastic_utils import es_connect
+
 with open('flow_conf.json') as json_file:
     conf = json.load(json_file)
-    ES_HOST = conf['elastic_host']
-    ES_PORT = conf['elastic_port']
-    ES_SCHEME = conf['elastic_scheme']
-    ES_URL = "{}://{}:{}".format(ES_SCHEME, ES_HOST, ES_PORT)
-    WAIT_TIME = conf['wait_time']
-    FLOW_INDEX_PREFIX = conf['flow_meter_index_prefix']
 
-    ESP_IP = conf['esp_ip']
-    ESP_PATH = conf['esp_data_path']
+override_conf_from_env_array(conf, 'elastic_hosts')
+override_conf_from_env(conf, 'log_level')
+override_conf_from_env(conf, 'elastic_port')
+override_conf_from_env(conf, 'elastic_scheme')
+override_conf_from_env(conf, 'elastic_subpath')
+override_conf_from_env(conf, 'elastic_username')
+override_conf_from_env(conf, 'elastic_password')
+override_conf_from_env(conf, 'wait_time')
+override_conf_from_env(conf, 'index_prefix')
+override_conf_from_env(conf, 'esp_ip')
+override_conf_from_env(conf, 'esp_data_path')
 
-es = Elasticsearch(ES_URL)
+LOG_LEVEL = conf['log_level']
+ES_HOSTS = conf['elastic_hosts']
+ES_SUBPATH = conf['elastic_subpath']
+ES_PORT = cast_int(conf['elastic_port'])
+ES_USER = conf['elastic_username']
+ES_PASS = conf['elastic_password']
+ES_SCHEME = conf['elastic_scheme']
+INDEX_PREFIX = conf['index_prefix']
+ESP_IP = conf['esp_ip']
+ESP_PATH = conf['esp_data_path']
+WAIT_TIME = cast_int(conf['wait_time'])
+DATA_PIN = cast_int(conf['pin'])
+
+es = es_connect(LOG_LEVEL, ES_SCHEME, ES_HOSTS, ES_PORT, ES_USER, ES_PASS, ES_SUBPATH)
 
 while True:
-    flow_index_name = "{}_{}".format(FLOW_INDEX_PREFIX, date.today().strftime("%Y%m%d"))
-    es.indices.create(index=flow_index_name, ignore=400)
+    index_name = "{}_{}".format(INDEX_PREFIX, date.today().strftime("%Y%m%d"))
+    es.indices.create(index=index_name, ignore=400)
 
     try:
-        # print("Received flow meter value of : {}".format(val.strip("vp-io-3 : ")))
-        # timestamp = datetime.now()
-        # flow_val = float(val.strip("vp-io-3 : ").strip("\r\n"))
-        # es.index(index=flow_index_name, id=timestamp,
-        #          body={"flow_value": flow_val, "value_format": "l/h",
-        #                "timestamp": timestamp})
-        # print("http://{}{}".format(ESP_IP, ESP_PATH))
-        # print(requests.get("http://{}{}".format(ESP_IP, ESP_PATH)))
         page = requests.get("http://{}{}".format(ESP_IP, ESP_PATH))
         payload = json.loads(page.content)
-        print(payload)
-        es.index(index=flow_index_name, id=timestamp,
-                 body={"flow_value": payload, "value_format": "l/h",
-                       "timestamp": timestamp})
+        timestamp = datetime.now()
+        log_msg(LOG_LEVEL, "info", "payload = {}".format(payload))
+        es.index(index=index_name, id=timestamp, body={"flow_value": payload, "value_format": "l/h", "timestamp": timestamp})
     except:
-        print("Something went wrong!", sys.exc_info()[0])
+        log_msg(LOG_LEVEL, "error", "Something went wrong! i = {}".format(sys.exc_info()[0]))
 
     sleep(WAIT_TIME)
