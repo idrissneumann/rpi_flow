@@ -1,6 +1,6 @@
 # Humidity and temperature sensor
 
-This project aims to collect the data from a flow sensor plugged in a raspberrypi and index those data into Elasticsearch and make some alerts with elastalert.
+This project aims to collect the data from a flow sensor plugged in an ESP32 and index those data into Elasticsearch hosted on a raspberrypi and make some beautiful dashboards using Kibana hosted too on the raspberrypi.
 
 The elasticstack images used are available [here](https://gitlab.comwork.io/oss/elasticstack/elasticstack-arm) in opensource too.
 
