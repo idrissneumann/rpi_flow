@@ -1,4 +1,4 @@
-# Humidity and temperature sensor
+# Flow sensor
 
 This project aims to collect the data from a flow sensor plugged in an ESP32 and index those data into Elasticsearch hosted on a raspberrypi and make some beautiful dashboards using Kibana hosted too on the raspberrypi.
 
