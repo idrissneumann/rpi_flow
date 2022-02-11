@@ -15,6 +15,7 @@ This project is used by the [veggiepi](https://veggiepi.comwork.io) project.
 * Main repo: https://gitlab.comwork.io/oss/veggiepi/flow
 * Github mirror backup: https://github.com/idrissneumann/rpi_flow
 * Gitlab mirror backup: https://gitlab.com/ineumann/rpi_flow
+* Bitbucket mirror backup: https://bitbucket.org/idrissneumann/flow
 
 ## Run locally using docker-compose
 
